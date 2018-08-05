@@ -3,6 +3,9 @@ from six.moves import range
 
 
 class BandSequentialDecoder(object):
+    """
+    BSQ
+    """
     def __init__(self, dtype, shape, compression=None):
         self.dtype = dtype
         self.shape = shape
@@ -19,6 +22,34 @@ class BandSequentialDecoder(object):
         else:
             data = numpy.fromfile(stream, self.dtype, self.size)
         return data.reshape(self.shape)
+
+
+class LineInterleavedDecoder(object):
+    """
+    BIL
+    """
+    def __init__(self, dtype, shape, compression=None):
+        self.dtype = dtype
+        self.shape = shape
+        self.sample_bytes = dtype.itemsize
+        self.compression = compression
+
+    @property
+    def size(self):
+        return numpy.product(self.shape)
+
+    def decode(self, stream):
+        bands, lines, samples = self.shape
+        bs = bands*samples
+        data = numpy.empty(self.shape, self.dtype)
+        for line in range(lines):
+            if self.compression:
+                chunk = numpy.fromstring(stream.read(bs * self.sample_bytes), self.dtype)
+            else:
+                chunk = numpy.fromfile(stream, self.dtype, bs)
+            data[:, line, :] = chunk.reshape((bands, samples))
+
+        return data
 
 
 class TileDecoder(object):

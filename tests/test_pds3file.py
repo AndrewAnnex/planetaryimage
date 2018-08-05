@@ -14,7 +14,6 @@ filename_float = os.path.join(DATA_DIR, 'pds3_1band_float.IMG')
 gzipped_filename = os.path.join(DATA_DIR, 'pds3_1band.IMG.gz')
 bz2_filename = os.path.join(DATA_DIR, 'pds3_1band.IMG.bz2')
 
-
 @pytest.fixture
 def expected():
     return numpy.loadtxt(os.path.join(DATA_DIR, 'pds3_1band.txt')).reshape(

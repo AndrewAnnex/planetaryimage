@@ -45,5 +45,9 @@ docs/_build
 docs/modules.rst
 docs/planetaryimage.rst
 
+# Pycharm
+.idea/
+
 # Sample Data
 tests/mission_data
+.pytest_cache/

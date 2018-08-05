@@ -142,9 +142,10 @@ class PlanetaryImage(object):
         """
         if self.bands == 1:
             return self.data.squeeze()
-        elif self.bands == 3:
+        elif self.bands > 1:
             return numpy.dstack(self.data)
-        # TODO: what about multiband images with 2, and 4+ bands?
+        else:
+            raise NotImplementedError('Have no impl for {} bands'.format(self.bands))
 
     @property
     def bands(self):

@@ -6,7 +6,7 @@ import pvl
 import collections
 
 from .image import PlanetaryImage
-from .decoders import BandSequentialDecoder
+from . import decoders
 
 
 class Pointer(collections.namedtuple('Pointer', ['filename', 'bytes'])):
@@ -311,6 +311,12 @@ class PDS3Image(PlanetaryImage):
 
     @property
     def _image_pointer(self):
+        # If we have a File object containing an Image within it
+        if '^IMAGE' not in self.label and 'FILE' in self.label:
+            new_label = self.label['FILE']
+            if '^IMAGE' in new_label:
+                self.label = new_label
+                return Pointer.parse(new_label['^IMAGE'], self.record_bytes)
         return Pointer.parse(self.label['^IMAGE'], self.record_bytes)
 
     @property
@@ -343,7 +349,12 @@ class PDS3Image(PlanetaryImage):
     @property
     def _decoder(self):
         if self.format == 'BAND_SEQUENTIAL':
-            return BandSequentialDecoder(
+            return decoders.BandSequentialDecoder(
                 self.dtype, self.shape, self.compression
             )
+        elif self.format == 'LINE_INTERLEAVED':
+            return decoders.LineInterleavedDecoder(
+                self.dtype, self.shape, self.compression
+            )
+
         raise ValueError('Unkown format (%s)' % self.format)
